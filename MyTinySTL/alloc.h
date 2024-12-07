@@ -100,7 +100,9 @@ inline void* alloc::allocate(size_t n)
     void* r = M_refill(M_round_up(n));
     return r;
   }
-  my_free_list = result->next;
+  // 局部变量不会反映到全局
+  // my_free_list = result->next;
+  free_list[M_freelist_index(n)] = result->next;
   return result;
 }
 
@@ -116,7 +118,9 @@ inline void alloc::deallocate(void* p, size_t n)
   FreeList* my_free_list;
   my_free_list = free_list[M_freelist_index(n)];
   q->next = my_free_list;
-  my_free_list = q;
+  // 局部变量不会反映到全局
+  // my_free_list = q;
+  free_list[M_freelist_index(n)] = q;
 }
 
 // 重新分配空间，接受三个参数，参数一为指向新空间的指针，参数二为原来空间的大小，参数三为申请空间的大小
